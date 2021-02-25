@@ -1,0 +1,35 @@
+service: lambda
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  user: ${opt:user, ''}
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-2'}
+  versionFunctions: false
+  tracing:
+    lambda: true
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - 'dynamodb:Scan'
+          Resource: "*"
+
+
+functions:
+  test:
+    handler: src/test.handler
+    description: test function
+    events:
+      - http:
+          path: test
+          method: post
+          cors: true
+          integration: lambda-proxy
+
+
+#resources:
+#  # Any additional resources created by cloudformation
+#  - ${file(resources/dynamodb-tables.yml)}
